@@ -1,22 +1,22 @@
 # beautify-tmux
 
-A small tmux config that puts a status light on every pane. I run several AI coding agents side by side over SSH, and I kept losing track of which one was still working, which one had finished, and which one was sitting there waiting for me to answer. Now the pane border tells me.
+tmux config that colours each pane by what the Claude Code session inside it is doing.
 
-🟡 busy &nbsp; 🟢 done &nbsp; 🔴 needs you
+🟡 working &nbsp; 🟢 finished &nbsp; 🔴 waiting for you
 
-![Four tmux panes, each with its own status light and coloured border](docs/demo.gif)
+![Four Claude Code sessions in tmux, each pane border coloured by the agent's state](docs/demo.gif)
 
 [Leia em português](README.pt-BR.md)
 
-## What it does
+**What.** A `tmux.conf` and a hook script. Each pane gets a light in its title bar, and the border turns the same colour.
 
-Every pane gets a title bar with the light, the folder it's in, and the pane title. The border takes the colour of the light, so you can see the state of every pane from across the room. Panes with no light keep a grey border, and the active pane gets a white label.
+**Why.** I keep four or five Claude Code agents open in tmux over SSH. One finishes, another stops to ask for permission, and I'd only notice minutes later when I happened to look at that pane.
 
-Borders are drawn with double lines over a grey strip, which gives panes some breathing room on a crowded screen.
+**What for.** Look at the screen, go to the red pane, answer it. Green panes are free for the next task.
 
-Alt + arrow keys move between panes without the prefix.
+**How.** Claude Code runs hooks on its own events. `install.sh --claude` registers three of them. Each one calls `hooks/tmux-light.sh`, which sets a pane option called `@light`, and the border colour in `tmux.conf` reads that option.
 
-It is one file with ten tmux commands in it. No plugin manager, no theme engine.
+The config also adds a title bar with the folder and the session title, double-line borders, and Alt + arrows to move between panes.
 
 ## Install
 
@@ -86,7 +86,7 @@ It removes the `source-file` line and the Claude Code hooks it added. The rest o
 
 ## How the demo was made
 
-`scripts/demo.sh` starts a throwaway tmux server with this config, attaches to it from a second throwaway server, and captures the screen frame by frame. The frames go through a small ANSI-to-HTML converter, Playwright takes the screenshots, and ffmpeg stitches the GIF. So the GIF above is the actual config, not a mockup.
+`scripts/demo.sh` runs this `tmux.conf` in a throwaway tmux server and calls `hooks/tmux-light.sh` the same way Claude Code does, with the same JSON on stdin. The agent output in the panes is scripted text. Playwright and ffmpeg turn the captured screens into the GIF.
 
 ## License
 

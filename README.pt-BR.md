@@ -1,22 +1,22 @@
 # beautify-tmux
 
-Uma config pequena de tmux que coloca um sinal luminoso em cada painel. Eu rodo vários agentes de IA lado a lado pelo SSH e vivia me perdendo: qual ainda estava trabalhando, qual já tinha terminado, qual estava parado esperando eu responder. Agora a borda do painel me avisa.
+Config de tmux que pinta cada painel conforme o que o Claude Code dentro dele está fazendo.
 
-🟡 trabalhando &nbsp; 🟢 terminou &nbsp; 🔴 precisa de você
+🟡 trabalhando &nbsp; 🟢 terminou &nbsp; 🔴 esperando você
 
-![Quatro painéis do tmux, cada um com seu sinal e a borda colorida](docs/demo.gif)
+![Quatro sessões do Claude Code no tmux, cada borda com a cor do estado do agente](docs/demo.gif)
 
 [Read in English](README.md)
 
-## O que faz
+**O que é.** Um `tmux.conf` e um script de hook. Cada painel ganha um sinal na barra de título e a borda fica da mesma cor.
 
-Cada painel ganha uma barra de título com o sinal, a pasta em que está e o título do painel. A borda pega a cor do sinal, então dá pra ver o estado de todos os painéis de longe. Painel sem sinal fica com a borda cinza, e o painel ativo ganha o rótulo branco.
+**Por que.** Eu deixo quatro, cinco agentes do Claude Code abertos no tmux pelo SSH. Um termina, outro para pedindo permissão, e eu só via minutos depois, quando batia o olho naquele painel.
 
-As bordas são linha dupla sobre uma faixa cinza, o que dá um respiro entre os painéis quando a tela está cheia.
+**Pra que.** Olha a tela, vai no painel vermelho, responde. Os verdes estão livres pra próxima tarefa.
 
-Alt + setas troca de painel sem apertar o prefixo.
+**Como.** O Claude Code roda hooks nos eventos dele. O `install.sh --claude` registra três. Cada um chama o `hooks/tmux-light.sh`, que grava uma opção do painel chamada `@light`, e a cor da borda no `tmux.conf` lê essa opção.
 
-É um arquivo só, com dez comandos de tmux. Sem gerenciador de plugin e sem motor de tema.
+A config também põe uma barra de título com a pasta e o título da sessão, borda de linha dupla e Alt + setas pra trocar de painel.
 
 ## Instalar
 
@@ -86,7 +86,7 @@ Remove a linha `source-file` e os hooks do Claude Code que ele colocou. O resto 
 
 ## Como o GIF foi feito
 
-O `scripts/demo.sh` sobe um servidor tmux descartável com esta config, conecta nele a partir de um segundo servidor descartável e captura a tela quadro a quadro. Os quadros passam por um conversor pequeno de ANSI pra HTML, o Playwright tira os prints e o ffmpeg junta o GIF. Ou seja, o GIF lá em cima é a config de verdade, não uma montagem.
+O `scripts/demo.sh` roda este `tmux.conf` num servidor tmux descartável e chama o `hooks/tmux-light.sh` do mesmo jeito que o Claude Code chama, com o mesmo JSON na entrada. O texto dos agentes nos painéis é roteirizado. O Playwright e o ffmpeg transformam as capturas no GIF.
 
 ## Licença
 

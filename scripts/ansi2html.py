@@ -79,6 +79,9 @@ def convert(text):
             run.append(f'<i class="w"><i class="dot" style="background:{DOTS[ch]}"></i></i>')
         elif wide(ch):
             run.append(f'<i class="w">{html.escape(ch)}</i>')
+        elif ord(ch) > 127 and not 0x2500 <= ord(ch) <= 0x257F:
+            # glyphs missing from the mono font fall back to wider ones; pin them to one cell
+            run.append(f'<i class="n">{html.escape(ch)}</i>')
         else:
             run.append(html.escape(ch))
     flush()
@@ -94,5 +97,6 @@ body{{margin:0;display:inline-block;padding:36px;background:linear-gradient(135d
 pre{{margin:0;padding:12px 14px 14px;font:15px/18px "DejaVu Sans Mono",monospace;color:{DEFAULT_FG}}}
 pre span{{display:inline}}
 .w{{font:inherit;font-style:normal;display:inline-block;width:2ch;text-align:center;vertical-align:top}}
+.n{{font:inherit;font-style:normal;display:inline-block;width:1ch;text-align:center;vertical-align:top;overflow:visible}}
 .dot{{display:inline-block;width:12px;height:12px;border-radius:50%;margin-top:3px}}
 </style><div class="win"><div class="bar"><b style="background:#ff5f57"></b><b style="background:#febc2e"></b><b style="background:#28c840"></b></div><pre>{body}</pre></div>""")
