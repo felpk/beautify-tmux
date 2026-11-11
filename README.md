@@ -61,6 +61,16 @@ tmux set -p @light 🟢
 tmux set -p -u @light   # turn it off
 ```
 
+## Split borders (optional)
+
+In stock tmux, the border between two panes takes a single colour (the active pane's), so the neighbour's light disappears there. Each pane's title bar always shows its own colour, but if you want both colours on the border:
+
+```sh
+~/.beautify-tmux/scripts/build-tmux.sh --install
+```
+
+It builds tmux 3.4 with a small patch (`patches/`) in a throwaway Docker container and installs it to `/usr/local/bin/tmux`. A shared border is split in half: the most recently selected pane gets the top half (vertical border) or the right half (horizontal border). Sessions already running keep the old tmux; it takes effect with the next server (`tmux kill-server` closes everything). To go back: `rm /usr/local/bin/tmux`.
+
 ## Keys
 
 | Key | Action |

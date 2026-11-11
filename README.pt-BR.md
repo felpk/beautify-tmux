@@ -61,6 +61,16 @@ tmux set -p @light 🟢
 tmux set -p -u @light   # apaga
 ```
 
+## Borda dividida (opcional)
+
+No tmux normal, a borda entre dois painéis fica com uma cor só (a do painel ativo), então o sinal do vizinho some dali. A barra de título de cada painel sempre mostra a cor dele, mas se quiser as duas cores na borda:
+
+```sh
+~/.beautify-tmux/scripts/build-tmux.sh --install
+```
+
+Compila o tmux 3.4 com um patch pequeno (`patches/`) num container Docker descartável e instala em `/usr/local/bin/tmux`. A borda compartilhada fica meio a meio: o painel selecionado por último fica com a metade de cima (borda vertical) ou da direita (borda horizontal). Sessões que já estão abertas continuam com o tmux antigo; vale a partir do próximo servidor (`tmux kill-server` fecha tudo). Pra voltar: `rm /usr/local/bin/tmux`.
+
 ## Teclas
 
 | Tecla | Ação |

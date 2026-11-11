@@ -1,0 +1,122 @@
+--- a/screen-redraw.c
++++ b/screen-redraw.c
+@@ -293,6 +293,21 @@
+ 	return (CELL_OUTSIDE);
+ }
+ 
++/* Check if two borders face each other (the two sides of one line). */
++static int
++screen_redraw_opposite_border(enum screen_redraw_border_type a,
++    enum screen_redraw_border_type b)
++{
++	return ((a == SCREEN_REDRAW_BORDER_LEFT &&
++	    b == SCREEN_REDRAW_BORDER_RIGHT) ||
++	    (a == SCREEN_REDRAW_BORDER_RIGHT &&
++	    b == SCREEN_REDRAW_BORDER_LEFT) ||
++	    (a == SCREEN_REDRAW_BORDER_TOP &&
++	    b == SCREEN_REDRAW_BORDER_BOTTOM) ||
++	    (a == SCREEN_REDRAW_BORDER_BOTTOM &&
++	    b == SCREEN_REDRAW_BORDER_TOP));
++}
++
+ /* Check if cell inside a pane. */
+ static int
+ screen_redraw_check_cell(struct client *c, u_int px, u_int py, int pane_status,
+@@ -300,8 +315,10 @@
+ {
+ 	struct window		*w = c->session->curw->window;
+ 	struct window_pane	*wp, *active;
++	struct window_pane	*first = NULL, *second = NULL, *recent, *older;
++	enum screen_redraw_border_type fborder = SCREEN_REDRAW_OUTSIDE;
+ 	int			 border;
+-	u_int			 right, line;
++	u_int			 right, line, lo, hi;
+ 
+ 	*wpp = NULL;
+ 
+@@ -336,18 +353,28 @@
+ 	do {
+ 		if (!window_pane_visible(wp))
+ 			goto next2;
+-		*wpp = wp;
++		if (first == NULL)
++			*wpp = wp;
+ 
+ 		/*
+ 		 * If definitely inside, return. If not on border, skip.
+-		 * Otherwise work out the cell.
++		 * Otherwise remember the pane, and a second pane on the
++		 * other side of the same border if there is one.
+ 		 */
+ 		border = screen_redraw_pane_border(wp, px, py, pane_status);
+-		if (border == SCREEN_REDRAW_INSIDE)
+-			return (CELL_INSIDE);
++		if (border == SCREEN_REDRAW_INSIDE) {
++			if (first == NULL)
++				return (CELL_INSIDE);
++			goto next2;
++		}
+ 		if (border == SCREEN_REDRAW_OUTSIDE)
+ 			goto next2;
+-		return (screen_redraw_type_of_cell(c, px, py, pane_status));
++		if (first == NULL) {
++			first = wp;
++			fborder = border;
++		} else if (second == NULL &&
++		    screen_redraw_opposite_border(fborder, border))
++			second = wp;
+ 
+ 	next2:
+ 		wp = TAILQ_NEXT(wp, entry);
+@@ -355,7 +382,41 @@
+ 			wp = TAILQ_FIRST(&w->panes);
+ 	} while (wp != active);
+ 
+-	return (CELL_OUTSIDE);
++	if (first == NULL)
++		return (CELL_OUTSIDE);
++	*wpp = first;
++
++	/*
++	 * beautify-tmux: a border shared by two panes is split in half, one
++	 * half each. The most recently selected pane gets the top half of a
++	 * vertical border and the right half of a horizontal one.
++	 */
++	if (second != NULL) {
++		if (second->active_point > first->active_point) {
++			recent = second;
++			older = first;
++		} else {
++			recent = first;
++			older = second;
++		}
++		if (fborder == SCREEN_REDRAW_BORDER_LEFT ||
++		    fborder == SCREEN_REDRAW_BORDER_RIGHT) {
++			lo = first->yoff > second->yoff ?
++			    first->yoff : second->yoff;
++			hi = first->yoff + first->sy < second->yoff + second->sy ?
++			    first->yoff + first->sy : second->yoff + second->sy;
++			if (hi > lo)
++				*wpp = (py < lo + (hi - lo) / 2) ? recent : older;
++		} else {
++			lo = first->xoff > second->xoff ?
++			    first->xoff : second->xoff;
++			hi = first->xoff + first->sx < second->xoff + second->sx ?
++			    first->xoff + first->sx : second->xoff + second->sx;
++			if (hi > lo)
++				*wpp = (px >= lo + (hi - lo) / 2) ? recent : older;
++		}
++	}
++	return (screen_redraw_type_of_cell(c, px, py, pane_status));
+ }
+ 
+ /* Check if the border of a particular pane. */
+@@ -638,7 +699,7 @@
+ 	wp->border_gc_set = 1;
+ 
+ 	ft = format_create_defaults(NULL, c, s, s->curw, wp);
+-	if (screen_redraw_check_is(x, y, ctx->pane_status, active))
++	if (wp == active)
+ 		style_apply(&wp->border_gc, oo, "pane-active-border-style", ft);
+ 	else
+ 		style_apply(&wp->border_gc, oo, "pane-border-style", ft);
