@@ -76,6 +76,7 @@ Compila o tmux 3.4 com um patch pequeno (`patches/`) num container Docker descar
 | Tecla | Ação |
 |---|---|
 | `Alt + ←` `→` `↑` `↓` | Vai pro painel naquela direção |
+| `Prefixo` e depois `T` | Dá nome ao painel (vazio volta pro título do programa) |
 
 O resto é o tmux de fábrica.
 

@@ -76,6 +76,7 @@ It builds tmux 3.4 with a small patch (`patches/`) in a throwaway Docker contain
 | Key | Action |
 |---|---|
 | `Alt + ←` `→` `↑` `↓` | Move to the pane in that direction |
+| `Prefix` then `T` | Name the pane (empty goes back to the program's title) |
 
 Everything else is stock tmux.
 
