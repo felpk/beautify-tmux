@@ -6,7 +6,7 @@ tmux config that colours each pane by what the Claude Code session inside it is 
 
 ![Four Claude Code sessions in tmux, each pane border coloured by the agent's state](docs/demo.gif)
 
-[Leia em português](README.pt-BR.md)
+[Português](README.pt-BR.md) · [Français](README.fr.md)
 
 **What.** A `tmux.conf` and a hook script. Each pane gets a light in its title bar, and the border turns the same colour.
 

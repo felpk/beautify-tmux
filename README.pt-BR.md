@@ -6,7 +6,7 @@ Config de tmux que pinta cada painel conforme o que o Claude Code dentro dele es
 
 ![Quatro sessões do Claude Code no tmux, cada borda com a cor do estado do agente](docs/demo.gif)
 
-[Read in English](README.md)
+[English](README.md) · [Français](README.fr.md)
 
 **O que é.** Um `tmux.conf` e um script de hook. Cada painel ganha um sinal na barra de título e a borda fica da mesma cor.
 
