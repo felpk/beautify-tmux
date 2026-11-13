@@ -40,7 +40,7 @@ Também registra três hooks no `~/.claude/settings.json` (precisa do `jq` e faz
 | Evento do Claude Code | Sinal |
 |---|---|
 | Você manda um prompt | 🟡 |
-| O Claude termina a vez dele | 🟢, ou 🔴 se a última linha da resposta for uma pergunta |
+| O Claude termina a vez dele | 🟢, ou 🔴 se a última linha da resposta for uma pergunta ou a resposta tiver um ❓ |
 | O Claude pede permissão ou uma resposta | 🔴 |
 
 Os hooks que você já tinha continuam lá.
@@ -60,6 +60,8 @@ Ou direto pelo tmux:
 tmux set -p @light 🟢
 tmux set -p -u @light   # apaga
 ```
+
+Para ouvir também (1 bip 🟡, 2 🟢, 3 🔴), coloque `set -g @light-bell on` no seu `~/.tmux.conf`.
 
 ## Borda dividida (opcional)
 
