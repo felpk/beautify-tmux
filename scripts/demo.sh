@@ -191,6 +191,8 @@ frame() { # seconds on screen
   tmux -L "$OUT" capture-pane -e -N -p -t 0 > "$WORK/f$n.txt"
   python3 "$ROOT/scripts/ansi2html.py" "$WORK/f$n.txt" > "$WORK/f$n.html"
   echo "$1" > "$WORK/f$n.dur"
+  # the pointer rests near the bottom right of the active pane, clear of the text
+  T display -p -t demo '#{e|-:#{e|+:#{pane_left},#{pane_width}},12} #{e|-:#{e|+:#{pane_top},#{pane_height}},3}' > "$WORK/f$n.cur"
   n=$((n + 1))
 }
 
@@ -209,14 +211,9 @@ T select-pane -t demo:0.3; show 3 docs3; hook 3 busy;               frame 1.4
 show 0 api3; hook 0 done "The sixth one gets a 429."
 show 3 docs4; hook 3 done "Done, REDIS_URL is gone."; sleep 2;      frame 3.0
 
-# Render every frame, then stitch them.
+# Render every frame (with the mouse pointer moving between panes), then stitch them.
 node "$ROOT/scripts/render.js" "$WORK" "$n"
 cp "$WORK/f3.png" "$ROOT/docs/screenshot.png"
-: > "$WORK/list.txt"
-for i in $(seq 0 $((n - 1))); do
-  printf "file '%s'\nduration %s\n" "$WORK/f$i.png" "$(cat "$WORK/f$i.dur")" >> "$WORK/list.txt"
-done
-printf "file '%s'\n" "$WORK/f$((n - 1)).png" >> "$WORK/list.txt"
 ffmpeg -loglevel error -y -f concat -safe 0 -i "$WORK/list.txt" \
   -vf "scale=1100:-1:flags=lanczos,split[a][b];[a]palettegen=stats_mode=full[p];[b][p]paletteuse=dither=none" \
   -loop 0 "$ROOT/docs/demo.gif"
