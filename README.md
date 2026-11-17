@@ -17,6 +17,7 @@ tmux config that colours each pane by what the Claude Code session inside it is 
 **How.** Claude Code runs hooks on its own events. `install.sh --claude` registers three of them. Each one calls `hooks/tmux-light.sh`, which sets a pane option called `@light`, and the border colour in `tmux.conf` reads that option.
 
 The config also adds a title bar with the folder and the session title, double-line borders, and Alt + arrows to move between panes.
+Panes you are not in fade out (focus mode), and a pane you only want to fire and forget can be hidden while it works.
 
 ## Install
 
@@ -79,6 +80,7 @@ It builds tmux 3.4 with a small patch (`patches/`) in a throwaway Docker contain
 |---|---|
 | `Alt + ←` `→` `↑` `↓` | Move to the pane in that direction |
 | `Prefix` then `T` | Name the pane (empty goes back to the program's title) |
+| `Prefix` then `H` | Hide the pane: it keeps running out of sight, a cover keeps its title and light. `H` again brings it back, `Prefix` then `x` closes it |
 | `Prefix` then `F` | Focus on/off: other panes fade out and keep only their title bar (on by default) |
 
 Everything else is stock tmux.

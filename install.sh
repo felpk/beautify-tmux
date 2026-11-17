@@ -25,7 +25,7 @@ else
   printf '\n# beautify-tmux\n%s\n' "$LINE" >> "$CONF"
   echo "tmux: added to $CONF (backup saved next to it)"
 fi
-chmod +x "$DIR/hooks/tmux-light.sh"
+chmod +x "$DIR/hooks/tmux-light.sh" "$DIR/hooks/tmux-hide.sh"
 
 if [ "${1:-}" = "--claude" ]; then
   need jq

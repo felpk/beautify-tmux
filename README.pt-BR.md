@@ -17,6 +17,7 @@ Config de tmux que pinta cada painel conforme o que o Claude Code dentro dele es
 **Como.** O Claude Code roda hooks nos eventos dele. O `install.sh --claude` registra três. Cada um chama o `hooks/tmux-light.sh`, que grava uma opção do painel chamada `@light`, e a cor da borda no `tmux.conf` lê essa opção.
 
 A config também põe uma barra de título com a pasta e o título da sessão, borda de linha dupla e Alt + setas pra trocar de painel.
+Os painéis em que você não está ficam apagados (modo foco), e um painel que você só quer mandar trabalhar e esquecer pode ser escondido enquanto roda.
 
 ## Instalar
 
@@ -79,6 +80,7 @@ Compila o tmux 3.4 com um patch pequeno (`patches/`) num container Docker descar
 |---|---|
 | `Alt + ←` `→` `↑` `↓` | Vai pro painel naquela direção |
 | `Prefixo` e depois `T` | Dá nome ao painel (vazio volta pro título do programa) |
+| `Prefixo` e depois `H` | Esconde o painel: ele continua rodando sem você ver, e uma capa fica no lugar com o título e a luz. `H` de novo mostra ele, `Prefixo` e depois `x` fecha |
 | `Prefixo` e depois `F` | Liga/desliga o foco: os outros painéis apagam e ficam só com o título (ligado por padrão) |
 
 O resto é o tmux de fábrica.

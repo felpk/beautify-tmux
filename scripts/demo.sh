@@ -156,7 +156,7 @@ EOF
 
 T() { tmux -L "$IN" "$@"; }
 P=(api web infra docs)   # pane 0..3
-show() { T send-keys -t "demo:0.$1" "clear && cat $WORK/s/$2" Enter; }
+show() { T send-keys -t "${ID[$1]}" "clear && cat $WORK/s/$2" Enter; }
 
 T -f "$ROOT/tmux.conf" new-session -d -s demo -x "$COLS" -y $((ROWS - 1)) "bash --norc --noprofile"
 T set -g status off
@@ -171,6 +171,8 @@ T select-pane -t demo:0.0 -T "Rate limit on login"
 T select-pane -t demo:0.1 -T "Fix pricing build"
 T select-pane -t demo:0.2 -T "Backups bucket"
 T select-pane -t demo:0.3 -T "Env vars in README"
+# Pane ids, so panes can still be reached after one of them is hidden.
+ID=(); for p in 0 1 2 3; do ID[$p]="$(T display -p -t "demo:0.$p" '#{pane_id}')"; done
 
 # Second server that just shows the first one, so capture-pane sees the borders.
 printf 'set -g default-terminal tmux-256color\nset -g status off\n' > "$WORK/outer.conf"
@@ -179,30 +181,33 @@ tmux -L "$OUT" -f "$WORK/outer.conf" -u new-session -d -x "$COLS" -y "$ROWS" "en
 # Call the hook the way Claude Code does: inside the pane's environment.
 SOCK="$(T display -p '#{socket_path}')"
 hook() { # pane, state, [last message for Stop]
-  local id; id="$(T display -p -t "demo:0.$1" '#{pane_id}')"
+  local id="${ID[$1]}"
   jq -n --arg m "${3:-}" '{hook_event_name:"Stop", last_assistant_message:$m}' |
     TMUX="$SOCK,0,0" TMUX_PANE="$id" "$ROOT/hooks/tmux-light.sh" "$2"
 }
 n=0
 frame() { # seconds on screen
   sleep 1.2
-  tmux -L "$OUT" capture-pane -e -p -t 0 > "$WORK/f$n.txt"
+  tmux -L "$OUT" capture-pane -e -N -p -t 0 > "$WORK/f$n.txt"
   python3 "$ROOT/scripts/ansi2html.py" "$WORK/f$n.txt" > "$WORK/f$n.html"
   echo "$1" > "$WORK/f$n.dur"
   n=$((n + 1))
 }
 
-# The story: four agents start, two finish, one asks for permission,
-# one ends on a question, you answer both and everything goes green.
+# The story: four agents start, you hide one, two finish, one asks for
+# permission, one ends on a question, you answer both and everything goes
+# green, the hidden one too. Focus mode fades the panes you are not in.
 T select-pane -t demo:0.0
 for p in 0 1 2 3; do show $p "${P[$p]}1"; hook $p busy; done;     frame 1.6
+# Prefix + H on the api pane: it keeps working behind a cover.
+TMUX="$SOCK,0,0" "$ROOT/hooks/tmux-hide.sh" "${ID[0]}"
 show 0 api2; show 1 web2; hook 1 done "Fixed. price was a string in one place.";  frame 1.6
 show 2 infra2; hook 2 ask;                                          frame 1.8
 show 3 docs2; hook 3 done "Should I take it out?";                  frame 2.0
 T select-pane -t demo:0.2; show 2 infra3; hook 2 done "Bucket backups-prod is up."; frame 1.6
 T select-pane -t demo:0.3; show 3 docs3; hook 3 busy;               frame 1.4
 show 0 api3; hook 0 done "The sixth one gets a 429."
-show 3 docs4; hook 3 done "Done, REDIS_URL is gone.";               frame 3.0
+show 3 docs4; hook 3 done "Done, REDIS_URL is gone."; sleep 2;      frame 3.0
 
 # Render every frame, then stitch them.
 node "$ROOT/scripts/render.js" "$WORK" "$n"
