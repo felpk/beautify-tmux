@@ -1,7 +1,8 @@
 // Screenshots each fN.html in a folder, adding a mouse pointer that glides to
 // the pane selected in that frame and clicks it. Called by demo.sh.
 // Usage: node render.js <folder> <frame count>
-// Reads fN.dur (seconds on screen) and fN.cur ("col row" the pointer rests on).
+// Reads fN.dur (seconds on screen), fN.cur ("col row" the pointer rests on)
+// and fN.key (keys pressed for that frame, shown as keycaps; may be empty).
 // Writes the PNGs and list.txt, the ffmpeg concat list in playing order.
 const fs = require('node:fs');
 const path = require('node:path');
@@ -27,7 +28,8 @@ const POINTER = `<svg width="26" height="26" viewBox="0 0 26 26" style="display:
   async function load(i) {
     await page.goto('file://' + path.join(dir, `f${i}.html`));
     return page.evaluate((svg) => {
-      document.body.style.position = 'relative';
+      // room under the window for the keycaps, same size on every frame
+      Object.assign(document.body.style, { position: 'relative', paddingBottom: '84px' });
       const pre = document.querySelector('pre');
       const probe = document.createElement('span');
       probe.textContent = 'M'.repeat(100);
@@ -43,17 +45,26 @@ const POINTER = `<svg width="26" height="26" viewBox="0 0 26 26" style="display:
       ring.id = 'ring';
       ring.style.cssText = 'position:absolute;z-index:9;width:34px;height:34px;margin:-17px 0 0 -17px;border-radius:50%;' +
         'border:3px solid rgba(77,196,255,.95);box-shadow:0 0 12px rgba(77,196,255,.7);display:none';
-      document.body.append(ring, ptr);
+      const keys = document.createElement('div');
+      keys.id = 'keys';
+      keys.style.cssText = 'position:absolute;z-index:11;left:50%;bottom:18px;transform:translateX(-50%);display:none;' +
+        'gap:8px;padding:10px 14px;border-radius:12px;background:rgba(14,15,20,.88);box-shadow:0 8px 24px rgba(0,0,0,.5);' +
+        'font:600 20px/1 "DejaVu Sans",sans-serif;color:#fff';
+      document.body.append(ring, ptr, keys);
       return { x0: r.left - b.left + parseFloat(cs.paddingLeft), y0: r.top - b.top + parseFloat(cs.paddingTop),
                cw, ch: parseFloat(cs.lineHeight) };
     }, POINTER);
   }
   const px = (g, [c, r]) => [g.x0 + (c + 0.5) * g.cw, g.y0 + (r + 0.5) * g.ch];
-  async function snap(x, y, click, dur) {
-    await page.evaluate(([x, y, click]) => {
+  async function snap(x, y, click, dur, key = '') {
+    await page.evaluate(([x, y, click, key]) => {
+      const k = document.getElementById('keys');
+      k.style.display = key ? 'flex' : 'none';
+      k.innerHTML = key.split(/\s{2,}/).map((c) => '<span style="padding:7px 12px;border-radius:7px;background:#2e3140;' +
+        'border:1px solid #555a6e;border-bottom-width:3px">' + c + '</span>').join('');
       Object.assign(document.getElementById('ptr').style, { left: x + 'px', top: y + 'px' });
       Object.assign(document.getElementById('ring').style, { left: x + 'px', top: y + 'px', display: click ? 'block' : 'none' });
-    }, [x, y, click]);
+    }, [x, y, click, key]);
     const file = path.join(dir, `s${shot++}.png`);
     await page.locator('body').screenshot({ path: file });
     list.push([file, dur]);
@@ -78,7 +89,14 @@ const POINTER = `<svg width="26" height="26" viewBox="0 0 26 26" style="display:
     }
     const g = await load(i);
     const [x, y] = px(g, cur);
-    const file = await snap(x, y, false, Number(read(`f${i}.dur`)));
+    const key = read(`f${i}.key`), dur = Number(read(`f${i}.dur`));
+    let file;
+    if (key) { // the keycaps show for most of the frame, then the screen stays a bit without them
+      file = await snap(x, y, false, Math.min(1.0, dur), key);
+      if (dur > 1.0) await snap(x, y, false, dur - 1.0);
+    } else {
+      file = await snap(x, y, false, dur);
+    }
     fs.copyFileSync(file, path.join(dir, `f${i}.png`));
     prev = cur;
   }
