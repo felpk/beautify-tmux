@@ -79,6 +79,7 @@ Le script compile tmux 3.4 avec un petit patch (`patches/`) dans un conteneur Do
 |---|---|
 | `Alt + ←` `→` `↑` `↓` | Aller au panneau dans cette direction |
 | `Prefix` puis `T` | Nommer le panneau (vide = revenir au titre du programme) |
+| `Prefix` puis `F` | Activer/désactiver le focus : les autres panneaux s'estompent et ne gardent que leur barre de titre (activé par défaut) |
 
 Tout le reste est le tmux d'origine.
 

@@ -79,6 +79,7 @@ It builds tmux 3.4 with a small patch (`patches/`) in a throwaway Docker contain
 |---|---|
 | `Alt + ←` `→` `↑` `↓` | Move to the pane in that direction |
 | `Prefix` then `T` | Name the pane (empty goes back to the program's title) |
+| `Prefix` then `F` | Focus on/off: other panes fade out and keep only their title bar (on by default) |
 
 Everything else is stock tmux.
 
