@@ -12,7 +12,7 @@ set -u
 
 if [ "${1:-}" = _cover ]; then
   real="$2"; me="$TMUX_PANE"
-  gone() { ! tmux display -p -t "$real" '' 2>/dev/null; }
+  gone() { ! tmux display -p -t "$real" '' >/dev/null 2>&1; }
   stop() {
     # still hidden (not brought back) -> close it together with the cover
     if [ "$(tmux display -p -t "$real" '#{window_name}' 2>/dev/null)" = "💤" ]; then
