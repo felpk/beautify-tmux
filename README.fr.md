@@ -17,7 +17,7 @@ Config tmux qui colore chaque panneau selon ce que fait la session Claude Code q
 **Comment.** Claude Code lance des hooks sur ses propres événements. `install.sh --claude` en enregistre trois. Chacun appelle `hooks/tmux-light.sh`, qui définit une option de panneau appelée `@light`, et la couleur de bordure du `tmux.conf` lit cette option.
 
 La config ajoute aussi une barre de titre avec le dossier et le titre de la session, des bordures à double trait, et Alt + flèches pour passer d'un panneau à l'autre.
-Les panneaux où vous n'êtes pas s'estompent (mode focus), et un panneau qu'on lance pour l'oublier peut être caché pendant qu'il travaille.
+Les panneaux où vous n'êtes pas s'estompent (mode focus), et un panneau qu'on lance pour l'oublier peut être caché pendant qu'il travaille. Chacun de ces panneaux garde sa propre teinte de fond, légère, pour que deux panneaux côte à côte ne se confondent jamais (`set -g @tint 0` la désactive).
 
 ## Installer
 
