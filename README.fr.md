@@ -81,6 +81,7 @@ Le script compile tmux 3.4 avec un petit patch (`patches/`) dans un conteneur Do
 | `Alt + ←` `→` `↑` `↓` | Aller au panneau dans cette direction |
 | `Prefix` puis `T` | Nommer le panneau (vide = revenir au titre du programme) |
 | `Prefix` puis `H` | Cacher le panneau : il continue de tourner hors de vue, un cache garde son titre et sa lumière. `H` à nouveau le fait revenir, `Prefix` puis `x` le ferme |
+| `Prefix` puis `w` | Lister tous les panneaux par titre, lumière et dossier, groupés par session, sans numéros. `Entrée` y va (`Prefix` puis `W` garde l'arbre numéroté) |
 | `Prefix` puis `F` | Activer/désactiver le focus : les autres panneaux s'estompent et ne gardent que leur barre de titre (activé par défaut) |
 
 Tout le reste est le tmux d'origine.

@@ -81,6 +81,7 @@ It builds tmux 3.4 with a small patch (`patches/`) in a throwaway Docker contain
 | `Alt + ←` `→` `↑` `↓` | Move to the pane in that direction |
 | `Prefix` then `T` | Name the pane (empty goes back to the program's title) |
 | `Prefix` then `H` | Hide the pane: it keeps running out of sight, a cover keeps its title and light. `H` again brings it back, `Prefix` then `x` closes it |
+| `Prefix` then `w` | List every pane by its title, light and folder, grouped by session, with no numbers. `Enter` jumps there (`Prefix` then `W` keeps the numbered tree) |
 | `Prefix` then `F` | Focus on/off: other panes fade out and keep only their title bar (on by default) |
 
 Everything else is stock tmux.

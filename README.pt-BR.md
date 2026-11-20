@@ -81,6 +81,7 @@ Compila o tmux 3.4 com um patch pequeno (`patches/`) num container Docker descar
 | `Alt + ←` `→` `↑` `↓` | Vai pro painel naquela direção |
 | `Prefixo` e depois `T` | Dá nome ao painel (vazio volta pro título do programa) |
 | `Prefixo` e depois `H` | Esconde o painel: ele continua rodando sem você ver, e uma capa fica no lugar com o título e a luz. `H` de novo mostra ele, `Prefixo` e depois `x` fecha |
+| `Prefixo` e depois `w` | Lista todos os painéis pelo título, luz e pasta, agrupados por sessão, sem números. `Enter` vai até ele (`Prefixo` e depois `W` mantém a árvore numerada) |
 | `Prefixo` e depois `F` | Liga/desliga o foco: os outros painéis apagam e ficam só com o título (ligado por padrão) |
 
 O resto é o tmux de fábrica.
