@@ -2,7 +2,8 @@
 # Gives every pane its own faint background tint, so two panes side by side
 # never look like one block. The tint follows the pane's place in the window
 # (pane 0 bluish, pane 1 greenish, ...), so neighbours always differ.
-# The active pane keeps the terminal background; the tints show on the others.
+# The active pane keeps its tint too (it doesn't go black when you click it);
+# it shows bright white text, the others fade.
 #
 #   tmux-tint.sh            -> retint every pane on the server
 #   set -g @tint 0          -> turn tints off (back to one shared background)
@@ -16,7 +17,10 @@ tint=$(tmux show -gv @tint 2>/dev/null)
 tmux list-panes -a -F '#{pane_id} #{pane_index}' | while read -r id idx; do
   if [ "$tint" = 0 ]; then
     tmux set -pu -t "$id" window-style
+    tmux set -pu -t "$id" window-active-style
   else
-    tmux set -p -t "$id" window-style "${fg}bg=${tints[idx % ${#tints[@]}]}"
+    bg="bg=${tints[idx % ${#tints[@]}]}"
+    tmux set -p -t "$id" window-style "${fg}${bg}"
+    tmux set -p -t "$id" window-active-style "fg=colour255,${bg}"
   fi
 done
