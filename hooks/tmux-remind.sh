@@ -5,11 +5,12 @@
 #                                           asks if the one there is done
 #   tmux-remind.sh up <pane_id>             puts the pane's reminder in capitals
 #   tmux-remind.sh show <client>            run by hooks on every pane, window or
-#                                           session change: if other panes still
-#                                           have a reminder, a box in the middle
-#                                           of the screen lists them for a moment.
-#                                           Any key closes it. It never stops you
-#                                           from going anywhere.
+#                                           session change: if any pane still has
+#                                           a reminder, the status bar turns pink
+#                                           and lists them all for a few seconds.
+#                                           You keep typing while it shows.
+#   tmux-remind.sh setup                    run once at load: teaches the status
+#                                           bar to show that list
 # A hidden pane (Prefix + H) keeps its reminder; its 💤 cover shows it.
 set -u
 export LC_ALL=C.UTF-8
@@ -33,27 +34,27 @@ up)
   [ -n "$todo" ] && tmux set -p -t "$2" @todo "${todo^^}"
   tmux refresh-client 2>/dev/null
   ;;
-show|_box)
-  client="$2"
-  active=$(tmux display -p -c "$client" '#{pane_id}' 2>/dev/null) || exit 0
-  left=(); width=24
-  # panes in the 💤 window are hidden ones: their cover already counts them
-  while IFS='|' read -r id wname todo; do
-    [ -z "$todo" ] || [ "$id" = "$active" ] || [ "$wname" = "💤" ] && continue
-    todo="${todo^^}"; left+=("$todo")
-    [ $(( ${#todo} + 8 )) -gt "$width" ] && width=$(( ${#todo} + 8 ))
-  done < <(tmux list-panes -a -F '#{pane_id}|#{window_name}|#{@todo}')
+show)
+  # every reminder still open, the current pane's too; panes in the 💤 window
+  # are hidden ones, their cover already counts them
+  left=()
+  while IFS='|' read -r wname todo; do
+    [ -z "$todo" ] || [ "$wname" = "💤" ] && continue
+    left+=("${todo^^}")
+  done < <(tmux list-panes -a -F '#{window_name}|#{@todo}')
   [ ${#left[@]} -eq 0 ] && exit 0
-  if [ "$1" = _box ]; then
-    # inside the popup: print the list, close after 3 s or on any key
-    printf '\e[?25l\n'
-    for t in "${left[@]}"; do printf '  \e[1;38;5;231m📌 %s\e[0m\n' "$t"; done
-    read -rsn1 -t 3
-    exit 0
-  fi
-  [ "$(tmux display -p -c "$client" '#{popup_active}' 2>/dev/null)" = 1 ] && exit 0
-  tmux display-popup -c "$client" -x C -y C -w "$width" -h $(( ${#left[@]} + 4 )) \
-    -T "#[align=centre bold] STILL TO DO " -S "fg=colour218" \
-    -E "bash '$me' _box '$client'"
+  text=$(printf '  ·  📌 %s' "${left[@]}"); text="${text:5}"
+  # The list takes over the status bar for a few seconds, in pink. It is part
+  # of the bar, not a popup, so keys keep going to the pane while it shows.
+  id="$$.$RANDOM"
+  tmux set -g @flash "STILL TO DO:  ${text//#/##}" \; set -g @flash-id "$id"
+  sleep "${REMIND_SECONDS:-4}"
+  [ "$(tmux show -gqv @flash-id)" = "$id" ] && tmux set -gu @flash
+  ;;
+setup)
+  # wraps the default status bar: while @flash is set, the bar shows it instead
+  tmux set -gu status-format
+  tmux set -g 'status-format[0]' \
+    "#{?@flash,#[fill=colour218 bg=colour218 fg=colour16 bold align=centre]#{@flash},$(tmux show -gv 'status-format[0]')}"
   ;;
 esac

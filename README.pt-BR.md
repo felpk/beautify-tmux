@@ -80,7 +80,7 @@ Compila o tmux 3.4 com um patch pequeno (`patches/`) num container Docker descar
 |---|---|
 | `Alt + ←` `→` `↑` `↓` | Vai pro painel naquela direção |
 | `Prefixo` e depois `T` | Dá nome ao painel (vazio volta pro título do programa) |
-| `Prefixo` e depois `R` | Deixa um lembrete no painel ("ver o vídeo"). Ele aparece como 📌 no título, e a cada troca de painel, janela ou sessão uma caixa no meio da tela lista os lembretes que faltam (também na capa de painel escondido). `R` de novo marca como feito |
+| `Prefixo` e depois `R` | Deixa um lembrete no painel ("ver o vídeo"). Ele aparece como 📌 no título, e a cada troca de painel, janela ou sessão a barra de baixo fica rosa por alguns segundos com todos os lembretes que faltam, sem travar o teclado (a capa de painel escondido também mostra o dela). `R` de novo marca como feito |
 | `Prefixo` e depois `H` | Esconde o painel: ele continua rodando sem você ver, e uma capa fica no lugar com o título e a luz. `H` de novo mostra ele, `Prefixo` e depois `x` fecha |
 | `Prefixo` e depois `w` | Lista todos os painéis pelo título, luz e pasta, agrupados por sessão, sem números. `Enter` vai até ele (`Prefixo` e depois `W` mantém a árvore numerada) |
 | `Prefixo` e depois `F` | Liga/desliga o foco: os outros painéis apagam e ficam só com o título (ligado por padrão) |

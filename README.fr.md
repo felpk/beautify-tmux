@@ -80,7 +80,7 @@ Le script compile tmux 3.4 avec un petit patch (`patches/`) dans un conteneur Do
 |---|---|
 | `Alt + ←` `→` `↑` `↓` | Aller au panneau dans cette direction |
 | `Prefix` puis `T` | Nommer le panneau (vide = revenir au titre du programme) |
-| `Prefix` puis `R` | Laisser un rappel sur le panneau (« regarder la vidéo »). Il s'affiche en 📌 dans sa barre de titre, et à chaque changement de panneau, de fenêtre ou de session une boîte au milieu de l'écran liste les rappels restants (aussi sur le cache d'un panneau caché). `R` à nouveau le marque comme fait |
+| `Prefix` puis `R` | Laisser un rappel sur le panneau (« regarder la vidéo »). Il s'affiche en 📌 dans sa barre de titre, et à chaque changement de panneau, de fenêtre ou de session la barre d'état passe en rose quelques secondes et liste tous les rappels restants, sans vous empêcher de taper (le cache d'un panneau caché montre aussi le sien). `R` à nouveau le marque comme fait |
 | `Prefix` puis `H` | Cacher le panneau : il continue de tourner hors de vue, un cache garde son titre et sa lumière. `H` à nouveau le fait revenir, `Prefix` puis `x` le ferme |
 | `Prefix` puis `w` | Lister tous les panneaux par titre, lumière et dossier, groupés par session, sans numéros. `Entrée` y va (`Prefix` puis `W` garde l'arbre numéroté) |
 | `Prefix` puis `F` | Activer/désactiver le focus : les autres panneaux s'estompent et ne gardent que leur barre de titre (activé par défaut) |
