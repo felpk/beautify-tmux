@@ -21,14 +21,23 @@ if [ "${1:-}" = _cover ]; then
     exit 0
   }
   trap stop HUP TERM INT
-  printf '\e[?25l\e[2J\e[H'
-  printf '\n  \e[1m💤 Hidden.\e[0m\n  Still running.\n\n  \e[38;5;244mPrefix + H shows it.\n  Prefix + x closes it.\e[0m\n'
+  shown=""
   while :; do
     gone && exit 0
     name=$(tmux display -p -t "$real" '#{?@name,#{@name},#{s/^[✳⠀-⣿] //:pane_title}}')
+    dir=$(tmux display -p -t "$real" '#{b:pane_current_path}')
     tmux set -p -t "$me" @name "💤 $name"
     light=$(tmux show -pqv -t "$real" @light)
     if [ -n "$light" ]; then tmux set -p -t "$me" @light "$light"; else tmux set -pu -t "$me" @light; fi
+    # The message names the pane in a bright block, so you know which one is
+    # sleeping without reading the border. Redrawn only when something changes.
+    if [ "$shown" != "$name|$dir|$light" ]; then
+      shown="$name|$dir|$light"
+      printf '\e[?25l\e[2J\e[H'
+      printf '\n  \e[1;38;5;255;48;5;33m  💤 %s  \e[0m %s\n' "$name" "$light"
+      printf '  \e[38;5;250m%s\e[0m\n\n' "$dir"
+      printf '  \e[1mHidden.\e[0m Still running.\n\n  \e[38;5;244mPrefix + H shows it.\n  Prefix + x closes it.\e[0m\n'
+    fi
     sleep 2 & wait $!
   done
 fi
