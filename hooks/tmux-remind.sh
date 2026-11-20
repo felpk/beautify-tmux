@@ -49,7 +49,9 @@ show)
   id="$$.$RANDOM"
   tmux set -g @flash "STILL TO DO:  ${text//#/##}" \; set -g @flash-id "$id"
   sleep "${REMIND_SECONDS:-4}"
-  [ "$(tmux show -gqv @flash-id)" = "$id" ] && tmux set -gu @flash
+  # a newer list may have taken the bar meanwhile: then leave it alone
+  if [ "$(tmux show -gqv @flash-id)" = "$id" ]; then tmux set -gu @flash; fi
+  exit 0
   ;;
 setup)
   # wraps the default status bar: while @flash is set, the bar shows it instead
