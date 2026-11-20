@@ -29,13 +29,16 @@ if [ "${1:-}" = _cover ]; then
     tmux set -p -t "$me" @name "💤 $name"
     light=$(tmux show -pqv -t "$real" @light)
     if [ -n "$light" ]; then tmux set -p -t "$me" @light "$light"; else tmux set -pu -t "$me" @light; fi
+    todo=$(tmux show -pqv -t "$real" @todo)
+    if [ -n "$todo" ]; then tmux set -p -t "$me" @todo "$todo"; else tmux set -pu -t "$me" @todo; fi
     # The message names the pane in a bright block, so you know which one is
     # sleeping without reading the border. Redrawn only when something changes.
-    if [ "$shown" != "$name|$dir|$light" ]; then
-      shown="$name|$dir|$light"
+    if [ "$shown" != "$name|$dir|$light|$todo" ]; then
+      shown="$name|$dir|$light|$todo"
       printf '\e[?25l\e[2J\e[H'
       printf '\n  \e[1;38;5;255;48;5;33m  💤 %s  \e[0m %s\n' "$name" "$light"
       printf '  \e[38;5;250m%s\e[0m\n\n' "$dir"
+      [ -n "$todo" ] && printf '  \e[1;38;5;16;48;5;218m 📌 %s \e[0m\n\n' "$todo"
       printf '  \e[1mHidden.\e[0m Still running.\n\n  \e[38;5;244mPrefix + H shows it.\n  Prefix + x closes it.\e[0m\n'
     fi
     sleep 2 & wait $!
